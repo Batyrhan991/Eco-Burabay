@@ -1,5 +1,8 @@
 'use strict';
 
+// API конфигурация
+const API_BASE = 'https://eco-burabay-api.vercel.app/api'; // Замените на ваш реальный API
+
 // Безопасное чтение из localStorage (чтобы система не ломалась от багов кэша браузера)
 function getStorageItem(key, defaultValue) {
   try {
@@ -39,11 +42,65 @@ let SIGHTS = getStorageItem('eco_sights', DEFAULT_SIGHTS);
 let TREES_DATA = getStorageItem('eco_trees', DEFAULT_TREES);
 let CURRENT_USER = getStorageItem('eco_current_user', null);
 let REPORT_COUNT = parseInt(localStorage.getItem('eco_reports_count')) || 2;
+let TOTAL_VISITORS = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
+
+// ===== API ФУНКЦИИ =====
+async function fetchFromServer(endpoint) {
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`);
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch (error) {
+    console.warn('API недоступен, использую локальные данные:', error);
+  }
+  return null;
+}
+
+async function postToServer(endpoint, data) {
+  try {
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return response.ok ? await response.json() : null;
+  } catch (error) {
+    console.warn('Ошибка при отправке на сервер:', error);
+    return null;
+  }
+}
+
+async function syncWithServer() {
+  // Загружаем деревья с сервера
+  const serverTrees = await fetchFromServer('/trees');
+  if (serverTrees && Array.isArray(serverTrees)) {
+    TREES_DATA = serverTrees;
+    localStorage.setItem('eco_trees', JSON.stringify(TREES_DATA));
+  }
+
+  // Загружаем счётчики с сервера
+  const serverStats = await fetchFromServer('/stats');
+  if (serverStats) {
+    if (serverStats.totalVisitors) TOTAL_VISITORS = serverStats.totalVisitors;
+    if (serverStats.reportCount) REPORT_COUNT = serverStats.reportCount;
+    localStorage.setItem('eco_total_visitors', TOTAL_VISITORS);
+    localStorage.setItem('eco_reports_count', REPORT_COUNT);
+  }
+
+  updateLiveCounters();
+  renderTrees();
+}
 
 function saveAllData() {
   localStorage.setItem('eco_sights', JSON.stringify(SIGHTS));
   localStorage.setItem('eco_trees', JSON.stringify(TREES_DATA));
   localStorage.setItem('eco_reports_count', REPORT_COUNT);
+  localStorage.setItem('eco_total_visitors', TOTAL_VISITORS);
+  
+  // Отправляем на сервер (асинхронно, не блокируем UI)
+  postToServer('/trees', { trees: TREES_DATA });
+  postToServer('/stats', { totalVisitors: TOTAL_VISITORS, reportCount: REPORT_COUNT });
 }
 
 // ===== УМНЫЕ СЧЕТЧИКИ =====
@@ -56,12 +113,7 @@ function updateLiveCounters() {
   if (treeCount) treeCount.textContent = TREES_DATA.length;
   if (sightCount) sightCount.textContent = SIGHTS.length;
   if (reportCount) reportCount.textContent = REPORT_COUNT;
-  
-  // Инициализация счётчика посещений
-  if (visitorCount) {
-    const totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
-    visitorCount.textContent = totalVisitors;
-  }
+  if (visitorCount) visitorCount.textContent = TOTAL_VISITORS;
 }
 
 // ===== СИСТЕМА ВХОДА (ТЕПЕРЬ РАБОТАЕТ) =====
@@ -193,7 +245,6 @@ function renderSights() {
     SIGHTS.forEach(s => {
       const box = document.getElementById(`main-qr-${s.id}`);
       if (box && typeof QRCode !== 'undefined') {
-        // Очищаем старый QR если есть
         box.innerHTML = '';
         new QRCode(box, { text: `https://eco-burabay.vercel.app/place/${s.id}`, width: 60, height: 60, colorDark: "#166534" });
       }
@@ -240,12 +291,10 @@ function initAdminLogic() {
       </tr>
     `).join('');
 
-    // Генерируем QR коды после отрисовки
     setTimeout(() => {
       SIGHTS.forEach(s => {
         const box = document.getElementById(`adm-qr-${s.id}`);
         if (box && typeof QRCode !== 'undefined') {
-          // Очищаем старый QR если есть
           box.innerHTML = '';
           new QRCode(box, { text: `https://eco-burabay.kz/place/${s.id}`, width: 35, height: 35 });
         }
@@ -427,18 +476,12 @@ function initRevealAnimation() {
 // ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ ЗА ВСЁ ВРЕМЯ =====
 function initVisitorCounter() {
   const hasVisitedSession = sessionStorage.getItem('eco_visited_session');
-  
-  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
 
   if (!hasVisitedSession) {
-    totalVisitors++;
-    localStorage.setItem('eco_total_visitors', totalVisitors);
+    TOTAL_VISITORS++;
+    localStorage.setItem('eco_total_visitors', TOTAL_VISITORS);
     sessionStorage.setItem('eco_visited_session', 'true');
-  }
-
-  const visitorEl = document.getElementById('liveVisitorCount');
-  if (visitorEl) {
-    visitorEl.textContent = totalVisitors;
+    saveAllData();
   }
 }
 
@@ -473,9 +516,15 @@ window.resetCleanForm = function() {
 };
 
 // ЗАПУСК
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Инициализируем счётчик посещений первым
   initVisitorCounter();
   updateLiveCounters();
+  
+  // Пытаемся синхронизироваться с сервером
+  await syncWithServer();
+  
+  // Инициализируем остальное
   setupFormsLogic();
   initAuthSystem();
   renderSights();
