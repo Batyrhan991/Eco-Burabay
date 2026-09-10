@@ -141,37 +141,7 @@ window.toggleAuthWindows = function(e, type) {
     loginWin.classList.remove('hidden');
   }
 };
-// ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ (увеличение при новом открытии вкладки) =====
-function initVisitorCounter() {
-  const visitorEl = document.getElementById('liveVisitorCount');
-  
-  if (!visitorEl) {
-    console.warn("Элемент #liveVisitorCount не найден в HTML!");
-    return;
-  }
 
-  // Берём значение или ставим 1250 для красивого старта
-  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
-  
-  // Проверяем текущую сессию вкладки
-  const isTabActive = sessionStorage.getItem('eco_tab_active');
-
-  if (!isTabActive) {
-    totalVisitors++;
-    localStorage.setItem('eco_total_visitors', totalVisitors);
-    sessionStorage.setItem('eco_tab_active', 'true');
-  }
-
-  // Выводим значение в HTML
-  visitorEl.textContent = totalVisitors;
-}
-
-  // Выводим на экран
-  const visitorEl = document.getElementById('liveVisitorCount');
-  if (visitorEl) {
-    visitorEl.textContent = totalVisitors;
-  }
-}
 // ===== ГЕНЕРАЦИЯ QR ГИДА =====
 function renderSights() {
   const container = document.getElementById('sightCards');
