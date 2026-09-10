@@ -67,21 +67,28 @@ function initAuthSystem() {
   }
 // ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ (увеличение при новом открытии вкладки) =====
 function initVisitorCounter() {
+  const visitorEl = document.getElementById('liveVisitorCount');
+  
+  if (!visitorEl) {
+    console.warn("Элемент #liveVisitorCount не найден в HTML!");
+    return;
+  }
+
+  // Берём значение или ставим 1250 для красивого старта
   let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
   
-  // Проверяем, есть ли активная вкладка прямо сейчас в памяти браузера
+  // Проверяем текущую сессию вкладки
   const isTabActive = sessionStorage.getItem('eco_tab_active');
 
   if (!isTabActive) {
-    // Если вкладка не была активна (это абсолютно новый заход или открытие новой вкладки/окна)
     totalVisitors++;
     localStorage.setItem('eco_total_visitors', totalVisitors);
-    
-    // Ставим метку, что эта вкладка теперь активна
     sessionStorage.setItem('eco_tab_active', 'true');
   }
-  // Если пользователь просто нажал F5 или обновил страницу, sessionStorage сохранится, 
-  // переменная isTabActive будет равна 'true', и число НЕ увеличится.
+
+  // Выводим значение в HTML
+  visitorEl.textContent = totalVisitors;
+}
 
   // Выводим на экран
   const visitorEl = document.getElementById('liveVisitorCount');
