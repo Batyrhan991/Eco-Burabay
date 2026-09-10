@@ -438,4 +438,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initAdminLogic();
   updateLiveCounters();
   initRevealAnimation();
+  initVisitorCounter();
 });
