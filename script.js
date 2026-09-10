@@ -21,7 +21,10 @@ const DEFAULT_TREES = [
   { id: 3, name: 'EcoCompany', species: 'Берёза повислая', place: 'Южный склон' }
 ];
 
-let SIGHTS = getStorageItem('eco_sights', DEFAULT_SIGHTS);
+let SIGHTS = getStorageItem('eco_sights', [
+  { id: 'burabay', name: 'Озеро Бурабай', subtitle: 'Главный водоём парка', image: '', shortDesc: 'Сердце национального парка.', description: 'Описание озера...' },
+  { id: 'okzhetpes', name: 'Скала Окжетпес', subtitle: 'Высота около 200 м', image: '', shortDesc: 'Величественная скала.', description: 'Описание скалы...' }
+]);
 let TREES_DATA = getStorageItem('eco_trees', DEFAULT_TREES);
 let CURRENT_USER = getStorageItem('eco_current_user', null);
 let REPORT_COUNT = parseInt(localStorage.getItem('eco_reports_count')) || 2;
@@ -39,7 +42,7 @@ function updateLiveCounters() {
   if (document.getElementById('liveReportCount')) document.getElementById('liveReportCount').textContent = REPORT_COUNT;
 }
 
-// ===== СИСТЕМА ВХОДА (ТЕПЕРЬ РАБОТАЕТ) =====
+// ===== СИСТЕМА ВХОДА =====
 function initAuthSystem() {
   const authBtn = document.getElementById('authBtn');
   const authModal = document.getElementById('authModal');
@@ -51,7 +54,7 @@ function initAuthSystem() {
   function refreshUI() {
     if (CURRENT_USER && CURRENT_USER.name) {
       authBtn.textContent = `Выйти (${CURRENT_USER.name})`;
-      authBtn.style.background = '#dc2626'; // Красный цвет кнопки выхода
+      authBtn.style.background = '#dc2626';
       if (CURRENT_USER.role === 'admin' && adminPanelBtn) {
         adminPanelBtn.classList.remove('hidden');
       } else {
@@ -60,13 +63,12 @@ function initAuthSystem() {
       }
     } else {
       authBtn.textContent = 'Войти';
-      authBtn.style.background = ''; // Возвращаем зеленый
+      authBtn.style.background = '';
       if (adminPanelBtn) adminPanelBtn.classList.add('hidden');
       if (adminSection) adminSection.classList.add('hidden');
     }
   }
 
-  // Логика нажатия на кнопку Войти/Выйти
   authBtn.addEventListener('click', () => {
     if (CURRENT_USER) {
       CURRENT_USER = null;
@@ -79,7 +81,6 @@ function initAuthSystem() {
     }
   });
 
-  // Логин форма
   document.getElementById('loginForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
@@ -97,7 +98,6 @@ function initAuthSystem() {
     showNotification(`Добро пожаловать, ${CURRENT_USER.name}!`);
   });
 
-  // Форма регистрации
   document.getElementById('registerForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('regName').value.trim();
@@ -166,7 +166,7 @@ function renderSights() {
   SIGHTS.forEach(s => {
     const box = document.getElementById(`main-qr-${s.id}`);
     if (box && typeof QRCode !== 'undefined') {
-      new QRCode(box, { text: `https://eco-burabay.versel.app/place/${s.id}`, width: 60, height: 60, colorDark: "#166534" });
+      new QRCode(box, { text: `https://eco-burabay.kz/place/${s.id}`, width: 60, height: 60, colorDark: "#166534" });
     }
   });
 }
@@ -237,7 +237,7 @@ function initAdminLogic() {
     }
 
     saveAllData();
-    resetAdminForm();
+    window.resetAdminForm();
     renderSights();
     updateAdminTable();
     updateLiveCounters();
@@ -306,7 +306,7 @@ window.plantTree = function(e) {
   saveAllData();
   renderTrees();
   updateLiveCounters();
-  closePlantModal();
+  window.closePlantModal();
   document.getElementById('plantForm').reset();
   showNotification('Дерево занесено в реестр проекта! 🌱');
 };
@@ -410,13 +410,10 @@ window.resetCleanForm = function() {
     succ.classList.add('hidden');
   }
 };
-// ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ ЗА ВСЁ ВРЕМЯ =====
+
 function initVisitorCounter() {
-  // Проверяем, заходил ли пользователь в этой сессии, 
-  // чтобы при обновлении страницы F5 число накручивалось только один раз за сессию
   const hasVisitedSession = sessionStorage.getItem('eco_visited_session');
-  
-  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250; // Стартовое число для красоты
+  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
 
   if (!hasVisitedSession) {
     totalVisitors++;
@@ -440,5 +437,4 @@ document.addEventListener('DOMContentLoaded', () => {
   updateLiveCounters();
   initRevealAnimation();
   initVisitorCounter();
- 
 });
