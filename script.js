@@ -11,8 +11,22 @@ function getStorageItem(key, defaultValue) {
 }
 
 const DEFAULT_SIGHTS = [
-  { id: 'burabay', name: 'Озеро Бурабай', subtitle: 'Главный водоём парка', shortDesc: 'Красивое озеро в сердце парка', description: 'Озеро Бурабай является главной достопримечательностью национального природного парка, известное своей кристальной водой и живописными берегами.', image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUTExMWFRUXGBUYGBc[...]' },
-  { id: 'okzhetpes', name: 'Скала Окжетпес', subtitle: 'Высота около 200 м', shortDesc: 'Впечатляющая горная скала', description: 'Скала Окжетпес - уникальная геологическая формация высотой около 200 метров, со своей вершины открывается прекрасный вид на всю территорию парка.', image: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUSExMWFhUXGBgYFxgYGBc[...]' }
+  { 
+    id: 'burabay', 
+    name: 'Озеро Бурабай', 
+    subtitle: 'Главный водоём парка', 
+    shortDesc: 'Красивое озеро в сердце парка', 
+    description: 'Озеро Бурабай является главной достопримечательностью национального природного парка, известное своей кристальной водой и живописными берегами. Это идеальное место для отдыха и созерцания природы.', 
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80' 
+  },
+  { 
+    id: 'okzhetpes', 
+    name: 'Скала Окжетпес', 
+    subtitle: 'Высота около 200 м', 
+    shortDesc: 'Впечатляющая горная скала', 
+    description: 'Скала Окжетпес - уникальная геологическая формация высотой около 200 метров, со своей вершины открывается прекрасный вид на всю территорию парка. Популярное место для пеших прогулок и альпинизма.', 
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80' 
+  }
 ];
 
 const DEFAULT_TREES = [
@@ -34,9 +48,20 @@ function saveAllData() {
 
 // ===== УМНЫЕ СЧЕТЧИКИ =====
 function updateLiveCounters() {
-  if (document.getElementById('liveTreeCount')) document.getElementById('liveTreeCount').textContent = TREES_DATA.length;
-  if (document.getElementById('liveSightCount')) document.getElementById('liveSightCount').textContent = SIGHTS.length;
-  if (document.getElementById('liveReportCount')) document.getElementById('liveReportCount').textContent = REPORT_COUNT;
+  const treeCount = document.getElementById('liveTreeCount');
+  const sightCount = document.getElementById('liveSightCount');
+  const reportCount = document.getElementById('liveReportCount');
+  const visitorCount = document.getElementById('liveVisitorCount');
+  
+  if (treeCount) treeCount.textContent = TREES_DATA.length;
+  if (sightCount) sightCount.textContent = SIGHTS.length;
+  if (reportCount) reportCount.textContent = REPORT_COUNT;
+  
+  // Инициализация счётчика посещений
+  if (visitorCount) {
+    const totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
+    visitorCount.textContent = totalVisitors;
+  }
 }
 
 // ===== СИСТЕМА ВХОДА (ТЕПЕРЬ РАБОТАЕТ) =====
@@ -150,7 +175,7 @@ function renderSights() {
   container.innerHTML = SIGHTS.map(s => `
     <div class="card" onclick="openSightModal('${s.id}')">
       <div class="card__img">
-        <img src="${s.image}" alt="${s.name}"/>
+        <img src="${s.image}" alt="${s.name}" style="width:100%; height:100%; object-fit:cover;"/>
       </div>
       <div class="card__body">
         <h3 class="card__title">${s.name}</h3>
@@ -163,12 +188,17 @@ function renderSights() {
     </div>
   `).join('');
 
-  SIGHTS.forEach(s => {
-    const box = document.getElementById(`main-qr-${s.id}`);
-    if (box && typeof QRCode !== 'undefined') {
-      new QRCode(box, { text: `https://eco-burabay.vercel.app/place/${s.id}`, width: 60, height: 60, colorDark: "#166534" });
-    }
-  });
+  // Генерируем QR коды после отрисовки
+  setTimeout(() => {
+    SIGHTS.forEach(s => {
+      const box = document.getElementById(`main-qr-${s.id}`);
+      if (box && typeof QRCode !== 'undefined') {
+        // Очищаем старый QR если есть
+        box.innerHTML = '';
+        new QRCode(box, { text: `https://eco-burabay.vercel.app/place/${s.id}`, width: 60, height: 60, colorDark: "#166534" });
+      }
+    });
+  }, 100);
 }
 
 window.openSightModal = function(id) {
@@ -210,12 +240,17 @@ function initAdminLogic() {
       </tr>
     `).join('');
 
-    SIGHTS.forEach(s => {
-      const box = document.getElementById(`adm-qr-${s.id}`);
-      if (box && typeof QRCode !== 'undefined') {
-        new QRCode(box, { text: `https://eco-burabay.kz/place/${s.id}`, width: 35, height: 35 });
-      }
-    });
+    // Генерируем QR коды после отрисовки
+    setTimeout(() => {
+      SIGHTS.forEach(s => {
+        const box = document.getElementById(`adm-qr-${s.id}`);
+        if (box && typeof QRCode !== 'undefined') {
+          // Очищаем старый QR если есть
+          box.innerHTML = '';
+          new QRCode(box, { text: `https://eco-burabay.kz/place/${s.id}`, width: 35, height: 35 });
+        }
+      });
+    }, 100);
   }
 
   form.addEventListener('submit', (e) => {
@@ -237,7 +272,7 @@ function initAdminLogic() {
       if (i !== -1) SIGHTS[i] = { ...SIGHTS[i], name, subtitle, image, shortDesc, description };
       showNotification('Объект успешно обновлен');
     } else {
-      SIGHTS.push({ id: 'id-' + Date.now(), name, subtitle, image, shortDesc, description });
+      SIGHTS.push({ id: 'id-' + Date.now(), name, subtitle, image: image || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80', shortDesc, description });
       showNotification('Новый объект добавлен');
     }
 
@@ -391,11 +426,9 @@ function initRevealAnimation() {
 
 // ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ ЗА ВСЁ ВРЕМЯ =====
 function initVisitorCounter() {
-  // Проверяем, заходил ли пользователь в этой сессии, 
-  // чтобы при обновлении страницы F5 число накручивалось только один раз за сессию
   const hasVisitedSession = sessionStorage.getItem('eco_visited_session');
   
-  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250; // Стартовое число для красоты
+  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
 
   if (!hasVisitedSession) {
     totalVisitors++;
@@ -441,12 +474,12 @@ window.resetCleanForm = function() {
 
 // ЗАПУСК
 document.addEventListener('DOMContentLoaded', () => {
+  initVisitorCounter();
+  updateLiveCounters();
   setupFormsLogic();
   initAuthSystem();
   renderSights();
   renderTrees();
   initAdminLogic();
-  updateLiveCounters();
   initRevealAnimation();
-  initVisitorCounter();
 });
