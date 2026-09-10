@@ -65,20 +65,25 @@ function initAuthSystem() {
       if (adminSection) adminSection.classList.add('hidden');
     }
   }
-// ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ ЗА ВСЁ ВРЕМЯ =====
+// ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ (увеличение при новом открытии вкладки) =====
 function initVisitorCounter() {
-  // Проверяем, заходил ли пользователь в этой сессии, 
-  // чтобы при обновлении страницы F5 число накручивалось только один раз за сессию
-  const hasVisitedSession = sessionStorage.getItem('eco_visited_session');
+  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
   
-  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250; // Стартовое число для красоты
+  // Проверяем, есть ли активная вкладка прямо сейчас в памяти браузера
+  const isTabActive = sessionStorage.getItem('eco_tab_active');
 
-  if (!hasVisitedSession) {
+  if (!isTabActive) {
+    // Если вкладка не была активна (это абсолютно новый заход или открытие новой вкладки/окна)
     totalVisitors++;
     localStorage.setItem('eco_total_visitors', totalVisitors);
-    sessionStorage.setItem('eco_visited_session', 'true');
+    
+    // Ставим метку, что эта вкладка теперь активна
+    sessionStorage.setItem('eco_tab_active', 'true');
   }
+  // Если пользователь просто нажал F5 или обновил страницу, sessionStorage сохранится, 
+  // переменная isTabActive будет равна 'true', и число НЕ увеличится.
 
+  // Выводим на экран
   const visitorEl = document.getElementById('liveVisitorCount');
   if (visitorEl) {
     visitorEl.textContent = totalVisitors;
