@@ -1,7 +1,7 @@
 'use strict';
 
 // API конфигурация
-const API_BASE = 'https://eco-burabay-api.vercel.app/api'; // Замените на ваш реальный API
+const API_BASE = 'https://eco-burabay-gf3t.vercel.app//api'; // Замените на ваш реальный API
 
 // Безопасное чтение из localStorage (чтобы система не ломалась от багов кэша браузера)
 function getStorageItem(key, defaultValue) {
