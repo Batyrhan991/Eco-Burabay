@@ -8,7 +8,7 @@ function getStorageItem(key, defaultValue) {
   } catch (e) {
     return defaultValue;
   }
-
+}
 
 const DEFAULT_SIGHTS = [
   { id: 'burabay', name: 'Озеро Бурабай', subtitle: 'Главный водоём парка', image: 'data:image/jpeg;base64,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', shortDesc: 'Сердце национального парка — кристальное озеро среди гранитных скал.', description: 'Озеро Бурабай (Боровое) — бессточное озеро в Бурабайском районе Акмолинской области Казахстана.' },
@@ -21,10 +21,7 @@ const DEFAULT_TREES = [
   { id: 3, name: 'EcoCompany', species: 'Берёза повислая', place: 'Южный склон' }
 ];
 
-let SIGHTS = getStorageItem('eco_sights', [
-  { id: 'burabay', name: 'Озеро Бурабай', subtitle: 'Главный водоём парка', image: '', shortDesc: 'Сердце национального парка.', description: 'Описание озера...' },
-  { id: 'okzhetpes', name: 'Скала Окжетпес', subtitle: 'Высота около 200 м', image: '', shortDesc: 'Величественная скала.', description: 'Описание скалы...' }
-]);
+let SIGHTS = getStorageItem('eco_sights', DEFAULT_SIGHTS);
 let TREES_DATA = getStorageItem('eco_trees', DEFAULT_TREES);
 let CURRENT_USER = getStorageItem('eco_current_user', null);
 let REPORT_COUNT = parseInt(localStorage.getItem('eco_reports_count')) || 2;
@@ -42,7 +39,7 @@ function updateLiveCounters() {
   if (document.getElementById('liveReportCount')) document.getElementById('liveReportCount').textContent = REPORT_COUNT;
 }
 
-// ===== СИСТЕМА ВХОДА =====
+// ===== СИСТЕМА ВХОДА (ТЕПЕРЬ РАБОТАЕТ) =====
 function initAuthSystem() {
   const authBtn = document.getElementById('authBtn');
   const authModal = document.getElementById('authModal');
@@ -54,7 +51,7 @@ function initAuthSystem() {
   function refreshUI() {
     if (CURRENT_USER && CURRENT_USER.name) {
       authBtn.textContent = `Выйти (${CURRENT_USER.name})`;
-      authBtn.style.background = '#dc2626';
+      authBtn.style.background = '#dc2626'; // Красный цвет кнопки выхода
       if (CURRENT_USER.role === 'admin' && adminPanelBtn) {
         adminPanelBtn.classList.remove('hidden');
       } else {
@@ -63,12 +60,13 @@ function initAuthSystem() {
       }
     } else {
       authBtn.textContent = 'Войти';
-      authBtn.style.background = '';
+      authBtn.style.background = ''; // Возвращаем зеленый
       if (adminPanelBtn) adminPanelBtn.classList.add('hidden');
       if (adminSection) adminSection.classList.add('hidden');
     }
   }
 
+  // Логика нажатия на кнопку Войти/Выйти
   authBtn.addEventListener('click', () => {
     if (CURRENT_USER) {
       CURRENT_USER = null;
@@ -81,6 +79,7 @@ function initAuthSystem() {
     }
   });
 
+  // Логин форма
   document.getElementById('loginForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value.trim();
@@ -98,6 +97,7 @@ function initAuthSystem() {
     showNotification(`Добро пожаловать, ${CURRENT_USER.name}!`);
   });
 
+  // Форма регистрации
   document.getElementById('registerForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = document.getElementById('regName').value.trim();
@@ -166,7 +166,7 @@ function renderSights() {
   SIGHTS.forEach(s => {
     const box = document.getElementById(`main-qr-${s.id}`);
     if (box && typeof QRCode !== 'undefined') {
-      new QRCode(box, { text: `https://eco-burabay.kz/place/${s.id}`, width: 60, height: 60, colorDark: "#166534" });
+      new QRCode(box, { text: `https://eco-burabay.versel.app/place/${s.id}`, width: 60, height: 60, colorDark: "#166534" });
     }
   });
 }
@@ -237,7 +237,7 @@ function initAdminLogic() {
     }
 
     saveAllData();
-    window.resetAdminForm();
+    resetAdminForm();
     renderSights();
     updateAdminTable();
     updateLiveCounters();
@@ -306,7 +306,7 @@ window.plantTree = function(e) {
   saveAllData();
   renderTrees();
   updateLiveCounters();
-  window.closePlantModal();
+  closePlantModal();
   document.getElementById('plantForm').reset();
   showNotification('Дерево занесено в реестр проекта! 🌱');
 };
@@ -380,7 +380,25 @@ function initRevealAnimation() {
   }, { threshold: 0.15 });
   items.forEach(i => observer.observe(i));
 }
+// ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ ЗА ВСЁ ВРЕМЯ =====
+function initVisitorCounter() {
+  // Проверяем, заходил ли пользователь в этой сессии, 
+  // чтобы при обновлении страницы F5 число накручивалось только один раз за сессию
+  const hasVisitedSession = sessionStorage.getItem('eco_visited_session');
+  
+  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250; // Стартовое число для красоты
 
+  if (!hasVisitedSession) {
+    totalVisitors++;
+    localStorage.setItem('eco_total_visitors', totalVisitors);
+    sessionStorage.setItem('eco_visited_session', 'true');
+  }
+
+  const visitorEl = document.getElementById('liveVisitorCount');
+  if (visitorEl) {
+    visitorEl.textContent = totalVisitors;
+  }
+}
 function showNotification(msg) {
   document.querySelectorAll('.eco-notification').forEach(el => el.remove());
   const banner = document.createElement('div');
@@ -410,22 +428,6 @@ window.resetCleanForm = function() {
     succ.classList.add('hidden');
   }
 };
-
-function initVisitorCounter() {
-  const hasVisitedSession = sessionStorage.getItem('eco_visited_session');
-  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250;
-
-  if (!hasVisitedSession) {
-    totalVisitors++;
-    localStorage.setItem('eco_total_visitors', totalVisitors);
-    sessionStorage.setItem('eco_visited_session', 'true');
-  }
-
-  const visitorEl = document.getElementById('liveVisitorCount');
-  if (visitorEl) {
-    visitorEl.textContent = totalVisitors;
-  }
-}
 
 // ЗАПУСК
 document.addEventListener('DOMContentLoaded', () => {
