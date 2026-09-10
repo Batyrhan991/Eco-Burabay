@@ -440,6 +440,25 @@ window.resetCleanForm = function() {
     succ.classList.add('hidden');
   }
 };
+// ===== СЧЕТЧИК ПОСЕТИТЕЛЕЙ ЗА ВСЁ ВРЕМЯ =====
+function initVisitorCounter() {
+  // Проверяем, заходил ли пользователь в этой сессии, 
+  // чтобы при обновлении страницы F5 число накручивалось только один раз за сессию
+  const hasVisitedSession = sessionStorage.getItem('eco_visited_session');
+  
+  let totalVisitors = parseInt(localStorage.getItem('eco_total_visitors')) || 1250; // Стартовое число для красоты
+
+  if (!hasVisitedSession) {
+    totalVisitors++;
+    localStorage.setItem('eco_total_visitors', totalVisitors);
+    sessionStorage.setItem('eco_visited_session', 'true');
+  }
+
+  const visitorEl = document.getElementById('liveVisitorCount');
+  if (visitorEl) {
+    visitorEl.textContent = totalVisitors;
+  }
+}
 
 // ЗАПУСК
 document.addEventListener('DOMContentLoaded', () => {
@@ -450,5 +469,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initAdminLogic();
   updateLiveCounters();
   initRevealAnimation();
+  initVisitorCounter();
  
 });
