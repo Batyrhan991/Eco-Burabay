@@ -1,5 +1,15 @@
 'use strict';
+import { NextResponse } from 'next/server';
+import { get } from '@vercel/global-config';
 
+export const config = { matcher: '/welcome' };
+
+export async function middleware() {
+  const greeting = await get('greeting');
+  // NextResponse.json requires at least Next v13.1 or
+  // enabling experimental.allowMiddlewareResponseBody in next.config.js
+  return NextResponse.json(greeting);
+}
 // API конфигурация
 const API_BASE = 'https://eco-burabay-gf3t.vercel.app//api'; // Замените на ваш реальный API
 
